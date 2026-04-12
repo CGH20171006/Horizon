@@ -8,7 +8,7 @@ import httpx
 from .models import ContentItem
 
 HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search"
-REDDIT_SEARCH_URL = "https://www.reddit.com/search.json"
+REDDIT_SEARCH_URL = "https://old.reddit.com/search.json"
 
 _reddit_semaphore = asyncio.Semaphore(5)
 
@@ -39,7 +39,15 @@ async def search_hn(query: str, client: httpx.AsyncClient) -> List[dict]:
 async def search_reddit(query: str, client: httpx.AsyncClient) -> List[dict]:
     """Search Reddit JSON API. Returns list of {title, url, source, score, num_comments, subreddit, date}."""
     params = {"q": query, "sort": "relevance", "limit": 3, "t": "year"}
-    headers = {"User-Agent": "Horizon/1.0 (tech news aggregator)"}
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/131.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/html;q=0.9, */*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+    }
     try:
         async with _reddit_semaphore:
             resp = await client.get(REDDIT_SEARCH_URL, params=params, headers=headers)

@@ -13,8 +13,12 @@ from ..models import ContentItem, RedditConfig, RedditSubredditConfig, RedditUse
 
 logger = logging.getLogger(__name__)
 
-REDDIT_BASE = "https://www.reddit.com"
-USER_AGENT = "Horizon/1.0 (content aggregator; +https://github.com/thysrael/horizon)"
+REDDIT_BASE = "https://old.reddit.com"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/131.0.0.0 Safari/537.36"
+)
 
 
 class RedditScraper(BaseScraper):
@@ -195,16 +199,33 @@ class RedditScraper(BaseScraper):
         )
 
     async def _reddit_get(self, url: str, params: dict) -> Optional[dict]:
-        headers = {"User-Agent": USER_AGENT}
-        try:
-            response = await self.client.get(url, params=params, headers=headers, follow_redirects=True)
-            if response.status_code == 429:
-                retry_after = int(response.headers.get("Retry-After", 5))
-                logger.warning("Reddit rate limited, retrying after %ds", retry_after)
-                await asyncio.sleep(retry_after)
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html;q=0.9, */*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        }
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
                 response = await self.client.get(url, params=params, headers=headers, follow_redirects=True)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPError as e:
-            logger.warning("Reddit request failed for %s: %s", url, e)
-            return None
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get("Retry-After", 5))
+                    logger.warning("Reddit rate limited, retrying after %ds", retry_after)
+                    await asyncio.sleep(retry_after)
+                    continue
+                if response.status_code == 403 and attempt < max_retries - 1:
+                    wait = 2 ** (attempt + 1)
+                    logger.warning("Reddit returned 403, retrying after %ds (attempt %d/%d)", wait, attempt + 1, max_retries)
+                    await asyncio.sleep(wait)
+                    continue
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPError as e:
+                if attempt < max_retries - 1:
+                    wait = 2 ** (attempt + 1)
+                    logger.warning("Reddit request failed for %s (attempt %d/%d): %s", url, attempt + 1, max_retries, e)
+                    await asyncio.sleep(wait)
+                else:
+                    logger.warning("Reddit request failed for %s: %s", url, e)
+                    return None
+        return None
