@@ -44,7 +44,7 @@ jobs:
         continue-on-error: true
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || exit 0
-          if git show gh-pages:CNAME &>/dev/null 2>&1; then
+          if git show gh-pages:CNAME &>/dev/null; then
             git worktree add /tmp/gh-pages gh-pages
             rm -f /tmp/gh-pages/CNAME
             cd /tmp/gh-pages
