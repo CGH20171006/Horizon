@@ -49,7 +49,9 @@ class ContentAnalyzer:
                         await self._analyze_item(item)
                         analyzed_items.append(item)
                     except Exception as e:
+                        import traceback
                         print(f"Error analyzing item {item.id}: {e}")
+                        traceback.print_exc()
                         item.ai_score = 0.0
                         item.ai_reason = "Analysis failed"
                         item.ai_summary = item.title
