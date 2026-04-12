@@ -17,6 +17,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Remove CNAME from gh-pages if exists
+        continue-on-error: true
+        run: |
+          git fetch origin gh-pages:gh-pages 2>/dev/null || exit 0
+          if git show gh-pages:CNAME &>/dev/null 2>&1; then
+            git worktree add /tmp/gh-pages gh-pages
+            rm -f /tmp/gh-pages/CNAME
+            cd /tmp/gh-pages
+            git add -A
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: remove invalid CNAME" || true
+            git push origin gh-pages
+            cd -
+            git worktree remove /tmp/gh-pages
+          fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

@@ -1,0 +1,30 @@
+name: Remove Custom Domain (CNAME)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remove-cname:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Remove CNAME if exists
+        run: |
+          if [ -f CNAME ]; then
+            rm CNAME
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: remove invalid custom domain (CNAME)"
+            git push
+            echo "✅ CNAME file removed successfully"
+          else
+            echo "ℹ️ No CNAME file found on gh-pages branch"
+          fi
