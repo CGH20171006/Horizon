@@ -141,6 +141,7 @@ class OpenAIClient(AIClient):
             ],
             temperature=temperature,
             max_tokens=max_tokens,
+            response_format={"type": "json_object"}
         )
         usage = getattr(response, "usage", None)
         if usage is not None:
@@ -149,10 +150,7 @@ class OpenAIClient(AIClient):
                 input_tokens=getattr(usage, "prompt_tokens", 0),
                 output_tokens=getattr(usage, "completion_tokens", 0),
             )
-        content = response.choices[0].message.content
-        if content is None:
-            raise ValueError("OpenAI API returned None content (possible tool_call or unsupported response_format)")
-        return content
+        return response.choices[0].message.content
 
 
 class MiniMaxClient(AIClient):
