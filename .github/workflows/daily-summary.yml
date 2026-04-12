@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to commit changes
+      pages: write     # Needed to clear custom domain via API
 
     steps:
       - name: Checkout code
@@ -39,6 +40,19 @@ jobs:
 
       - name: Set current date as environment variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Clear custom domain via GitHub Pages API
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" \
+            -d '{"cname":null,"source":{"branch":"gh-pages","path":"/"}}')
+          echo "Clear custom domain API returned HTTP $HTTP_STATUS"
 
       - name: Remove CNAME from gh-pages if exists
         continue-on-error: true

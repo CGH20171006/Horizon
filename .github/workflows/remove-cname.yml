@@ -8,8 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
 
     steps:
+      - name: Clear custom domain via GitHub Pages API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔧 Clearing custom domain in GitHub Pages settings..."
+          HTTP_STATUS=$(curl -s -o /tmp/pages_response.json -w "%{http_code}" \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" \
+            -d '{"cname":null,"source":{"branch":"gh-pages","path":"/"}}')
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Custom domain cleared via API (HTTP $HTTP_STATUS)"
+          else
+            echo "⚠️ API call returned HTTP $HTTP_STATUS"
+            cat /tmp/pages_response.json
+          fi
+
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:

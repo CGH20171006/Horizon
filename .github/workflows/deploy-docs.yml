@@ -10,12 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Clear custom domain via GitHub Pages API
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" \
+            -d '{"cname":null,"source":{"branch":"gh-pages","path":"/"}}')
+          echo "Clear custom domain API returned HTTP $HTTP_STATUS"
 
       - name: Remove CNAME from gh-pages if exists
         continue-on-error: true
