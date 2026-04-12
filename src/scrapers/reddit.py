@@ -214,7 +214,7 @@ class RedditScraper(BaseScraper):
                     await asyncio.sleep(retry_after)
                     continue
                 if response.status_code == 403 and attempt < max_retries - 1:
-                    wait = 2 * (attempt + 1)
+                    wait = 2 ** (attempt + 1)
                     logger.warning("Reddit returned 403, retrying after %ds (attempt %d/%d)", wait, attempt + 1, max_retries)
                     await asyncio.sleep(wait)
                     continue
@@ -222,7 +222,7 @@ class RedditScraper(BaseScraper):
                 return response.json()
             except httpx.HTTPError as e:
                 if attempt < max_retries - 1:
-                    wait = 2 * (attempt + 1)
+                    wait = 2 ** (attempt + 1)
                     logger.warning("Reddit request failed for %s (attempt %d/%d): %s", url, attempt + 1, max_retries, e)
                     await asyncio.sleep(wait)
                 else:
