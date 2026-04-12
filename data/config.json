@@ -40,8 +40,8 @@
     ],
     "hackernews": {
       "enabled": true,
-      "fetch_top_stories": 10,
-      "min_score": 200
+      "fetch_top_stories": 30,
+      "min_score": 150
     },
     "rss": [
       {
@@ -57,6 +57,54 @@
         "category": "github-trending"
       },
       {
+        "name": "MIT Technology Review",
+        "url": "https://www.technologyreview.com/feed/",
+        "enabled": true,
+        "category": "ai-tech"
+      },
+      {
+        "name": "VentureBeat AI",
+        "url": "https://venturebeat.com/ai/feed/",
+        "enabled": true,
+        "category": "ai-tech"
+      },
+      {
+        "name": "Reuters World News",
+        "url": "https://feeds.reuters.com/reuters/worldNews",
+        "enabled": true,
+        "category": "international"
+      },
+      {
+        "name": "The Economist Finance",
+        "url": "https://www.economist.com/finance-and-economics/rss.xml",
+        "enabled": true,
+        "category": "finance"
+      },
+      {
+        "name": "量子位",
+        "url": "https://wechat2rss.xlab.app/feed/7131b577c61365cb47e81000738c10d872685908.xml",
+        "enabled": true,
+        "category": "ai-news"
+      },
+      {
+        "name": "新智元",
+        "url": "https://wechat2rss.xlab.app/feed/ede30346413ea70dbef5d485ea5cbb95cca446e7.xml",
+        "enabled": true,
+        "category": "ai-news"
+      },
+      {
+        "name": "Quanta Magazine",
+        "url": "https://api.quantamagazine.org/feed/",
+        "enabled": true,
+        "category": "science"
+      },
+      {
+        "name": "Nature",
+        "url": "https://www.nature.com/nature.rss",
+        "enabled": true,
+        "category": "science"
+      },
+      {
         "name": "LWN.net",
         "url": "https://lwn.net/headlines/full_text?key=${LWN_KEY}",
         "enabled": false,
@@ -64,7 +112,7 @@
       }
     ],
     "reddit": {
-      "enabled": false,
+      "enabled": true,
       "subreddits": [
         {
           "subreddit": "MachineLearning",
@@ -81,6 +129,46 @@
           "time_filter": "day",
           "fetch_limit": 15,
           "min_score": 60
+        },
+        {
+          "subreddit": "worldnews",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 15,
+          "min_score": 500
+        },
+        {
+          "subreddit": "geopolitics",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 100
+        },
+        {
+          "subreddit": "technology",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 15,
+          "min_score": 200
+        },
+        {
+          "subreddit": "investing",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 100
+        },
+        {
+          "subreddit": "economics",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 100
         }
       ],
       "users": [],
